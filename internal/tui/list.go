@@ -1,6 +1,8 @@
 package tui
 
 import (
+	"fmt"
+
 	"github.com/cdevoogd/git-branches/internal/git"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -50,10 +52,18 @@ func (m model) View() string {
 func Start(branches []*git.Branch) error {
 	items := make([]list.Item, len(branches))
 	for i, b := range branches {
-		items[i] = &listItem{title: b.Name, desc: b.LastCommit}
+		items[i] = &listItem{
+			title: b.Name,
+			desc:  fmt.Sprintf("%s\n%s", b.Description, b.LastCommit),
+		}
 	}
 
-	m := model{list: list.New(items, list.NewDefaultDelegate(), 0, 0)}
+	// Since the list item's description field contains the branch description and the last commit,
+	// the delegate has a height of 3 to compensate (those two plus the branch name)
+	delegate := list.NewDefaultDelegate()
+	delegate.SetHeight(3)
+
+	m := model{list: list.New(items, delegate, 0, 0)}
 	m.list.Title = "Git Branches"
 
 	p := tea.NewProgram(m, tea.WithAltScreen())
