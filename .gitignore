@@ -1,0 +1,20 @@
+# Because dotfiles tend to contain machine-specific or even sensitive information, ignore them by default.
+.*
+
+# Some dotfiles are important to commit
+!.gitignore
+!.gitattributes
+!.github
+
+# Logs and databases
+*.log
+**/logs
+
+# Operating system files
+ehthumbs.db
+Thumbs.db
+
+# Compiled and cached code
+build/
+dist/
+out/
