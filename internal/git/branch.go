@@ -28,11 +28,7 @@ type Branch struct {
 func NewBranch(name string) (*Branch, error) {
 	branchType, name := determineBranchType(name)
 	desc := getBranchDescription(name)
-
-	lastCommit, err := getLastCommit(name)
-	if err != nil {
-		return nil, errors.Wrapf(err, "error getting last commit for %s", name)
-	}
+	lastCommit := getLastCommit(name)
 
 	return &Branch{
 		Type:        branchType,
@@ -88,23 +84,26 @@ func determineBranchType(name string) (branchType BranchType, strippedName strin
 
 func getBranchDescription(name string) string {
 	cmd := exec.Command("git", "config", "--get", "branch."+name+".description")
-
-	// If a branch doesn't have a description, Git will exit with an error. Because of that, I am
-	// relying on the exit code alone instead of checking the returned error.
 	stdout, _ := cmd.Output()
-	if cmd.ProcessState.ExitCode() == 0 {
-		return strings.TrimSpace(string(stdout))
+
+	// Git returns a non-zero exit code if the branch does not have a description, so I am relying
+	// on the exit code instead of the returned error.
+	if cmd.ProcessState.ExitCode() != 0 {
+		return ""
 	}
 
-	return ""
+	return strings.TrimSpace(string(stdout))
 }
 
-func getLastCommit(branch string) (string, error) {
+func getLastCommit(branch string) string {
 	cmd := exec.Command("git", "log", "-1", "--format=format:[%h] %s (%ah)", branch)
-	stdout, err := cmd.Output()
-	if err != nil {
-		return "", err
+	stdout, _ := cmd.Output()
+
+	// Git returns a non-zero exit code if the branch does not have a commit, so I am relying on
+	// the exit code instead of the returned error.
+	if cmd.ProcessState.ExitCode() != 0 {
+		return ""
 	}
 
-	return strings.TrimSpace(string(stdout)), nil
+	return strings.TrimSpace(string(stdout))
 }
