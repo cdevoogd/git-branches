@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/cdevoogd/git-branches/internal/git"
+	"github.com/cdevoogd/git-branches/internal/tui"
 )
 
 func main() {
@@ -19,5 +20,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println(branches)
+	err = tui.Start(branches)
+	if err != nil {
+		fmt.Println("Error running TUI:", err)
+		os.Exit(1)
+	}
 }
