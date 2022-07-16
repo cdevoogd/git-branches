@@ -16,16 +16,23 @@ const (
 )
 
 type Branch struct {
-	Type BranchType
-	Name string
+	Type        BranchType
+	Name        string
+	Description string
 }
 
 // NewBranch constructs a new Branch structure based on the given branch. The branch name must
 // match the name of a branch that exists in the current Git repository. Using the name, the
 // function will gather information about the branch and populate the structure.
 func NewBranch(name string) (*Branch, error) {
-	branchType, strippedName := determineBranchType(name)
-	return &Branch{Type: branchType, Name: strippedName}, nil
+	branchType, name := determineBranchType(name)
+	desc := getBranchDescription(name)
+
+	return &Branch{
+		Type:        branchType,
+		Name:        name,
+		Description: desc,
+	}, nil
 }
 
 // Branches returns a list of Git branches in the current repository.
@@ -70,4 +77,17 @@ func determineBranchType(name string) (branchType BranchType, strippedName strin
 	}
 
 	return branchType, strings.TrimSpace(name)
+}
+
+func getBranchDescription(name string) string {
+	cmd := exec.Command("git", "config", "--get", "branch."+name+".description")
+
+	// If a branch doesn't have a description, Git will exit with an error. Because of that, I am
+	// relying on the exit code alone instead of checking the returned error.
+	stdout, _ := cmd.Output()
+	if cmd.ProcessState.ExitCode() == 0 {
+		return strings.TrimSpace(string(stdout))
+	}
+
+	return ""
 }
