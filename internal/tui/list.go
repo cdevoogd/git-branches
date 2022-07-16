@@ -73,8 +73,13 @@ func formatBranch(b *git.Branch) *listItem {
 		title = fmt.Sprintf("%s (%s)", b.Name, b.Type)
 	}
 
+	desc := b.LastCommit
+	if b.Description != "" {
+		desc = fmt.Sprintf("%s\n%s", b.Description, b.LastCommit)
+	}
+
 	return &listItem{
 		title: title,
-		desc:  fmt.Sprintf("%s\n%s", b.Description, b.LastCommit),
+		desc:  desc,
 	}
 }
