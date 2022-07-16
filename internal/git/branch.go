@@ -15,6 +15,12 @@ const (
 	BranchTypeWorktree
 )
 
+var branchTypeStrings = []string{"normal", "current", "worktree"}
+
+func (bt BranchType) String() string {
+	return branchTypeStrings[bt]
+}
+
 type Branch struct {
 	Type        BranchType
 	Name        string

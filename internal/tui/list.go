@@ -52,10 +52,7 @@ func (m model) View() string {
 func Start(branches []*git.Branch) error {
 	items := make([]list.Item, len(branches))
 	for i, b := range branches {
-		items[i] = &listItem{
-			title: b.Name,
-			desc:  fmt.Sprintf("%s\n%s", b.Description, b.LastCommit),
-		}
+		items[i] = formatBranch(b)
 	}
 
 	// Since the list item's description field contains the branch description and the last commit,
@@ -68,4 +65,16 @@ func Start(branches []*git.Branch) error {
 
 	p := tea.NewProgram(m, tea.WithAltScreen())
 	return p.Start()
+}
+
+func formatBranch(b *git.Branch) *listItem {
+	title := b.Name
+	if b.Type != git.BranchTypeNormal {
+		title = fmt.Sprintf("%s (%s)", b.Name, b.Type)
+	}
+
+	return &listItem{
+		title: title,
+		desc:  fmt.Sprintf("%s\n%s", b.Description, b.LastCommit),
+	}
 }
