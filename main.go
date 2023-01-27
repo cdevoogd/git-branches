@@ -1,11 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
 	"github.com/cdevoogd/git-branches/internal/git"
-	"github.com/cdevoogd/git-branches/internal/tui"
 )
 
 func main() {
@@ -20,9 +20,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = tui.Start(branches)
-	if err != nil {
-		fmt.Println("Error running TUI:", err)
-		os.Exit(1)
+	for _, branch := range branches {
+		bytes, err := json.MarshalIndent(branch, "", "    ")
+		if err != nil {
+			fmt.Println("Error marshalling JSON:", err)
+			os.Exit(1)
+		}
+
+		fmt.Println(string(bytes))
 	}
 }
