@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/fatih/color"
 
 	"github.com/cdevoogd/git-branches/internal/git"
@@ -32,7 +34,8 @@ func main() {
 		log.Fatal("An error occured when querying for branches:", err)
 	}
 
-	for _, branch := range branches {
+	lastIndex := len(branches) - 1
+	for i, branch := range branches {
 		nameStyle, ok := nameStyles[branch.Type]
 		if !ok {
 			log.Fatalf("No style is available for branch type %q", branch.Type)
@@ -43,5 +46,10 @@ func main() {
 			descStyle.Printf(" (%s)", branch.Description)
 		}
 		commitStyle.Printf("\n    %s\n", branch.LastCommit)
+
+		// Add some spacing between branches
+		if i != lastIndex {
+			fmt.Println()
+		}
 	}
 }
