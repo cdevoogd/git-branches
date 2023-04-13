@@ -16,6 +16,9 @@ import (
 var (
 	itemStyle         = lipgloss.NewStyle().Foreground(color.White)
 	selectedItemStyle = lipgloss.NewStyle().Foreground(color.Red)
+
+	defaultPromptStyle      = lipgloss.NewStyle().Foreground(color.Red)
+	finishPromptPrefixStyle = lipgloss.NewStyle().Foreground(lipgloss.Color(color.Green))
 )
 
 func Run(branches []*git.Branch) int {
@@ -68,16 +71,16 @@ func (d *deleteHandler) getBranchesToDelete() ([]string, error) {
 	}
 
 	msg := "Choose branches to delete:"
-	return prompt.New().Ask(msg).MultiChoose(
+	return prompt.New(prompt.WithTheme(themePrompt)).Ask(msg).MultiChoose(
 		choices,
-		multichoose.WithTheme(d.displayBranches),
+		multichoose.WithTheme(d.themeChoices),
 		multichoose.WithHelp(true),
 	)
 }
 
-// displayBranches returns a styled string that can be used to display the prompt to the user. It
-// is meant to fulfil the multichoose.Theme interface.
-func (d *deleteHandler) displayBranches(branches []string, cursor int, isSelected multichoose.IsSelected) string {
+// themeChoices returns a styled string that can be used to display the branch choices to the user.
+// It is meant to fulfil the multichoose.Theme interface.
+func (d *deleteHandler) themeChoices(branches []string, cursor int, isSelected multichoose.IsSelected) string {
 	s := strings.Builder{}
 	s.WriteString("\n")
 
@@ -107,4 +110,37 @@ func getDisplayStyle(itemAtCursor, selected bool) (symbol string, style lipgloss
 		return "x", itemStyle
 	}
 	return " ", itemStyle
+}
+
+// displayBranches returns a styled string that can be used to display the prompt to the user. It
+// is meant to fulfil the prompt.Theme interface. This acts similar to the default theme but with
+// colors that match the rest of the branch choice prompt.
+func themePrompt(msg string, state prompt.State, model string) string {
+	s := strings.Builder{}
+
+	switch state {
+	case prompt.StateNormal:
+		s.WriteString(defaultPromptStyle.Render("?"))
+	case prompt.StateFinish:
+		s.WriteString(finishPromptPrefixStyle.Render("✔"))
+	case prompt.StateError:
+		s.WriteString(defaultPromptStyle.Render("✖"))
+	}
+
+	s.WriteString(" ")
+	s.WriteString(msg)
+	s.WriteString(" ")
+
+	if state == prompt.StateNormal {
+		s.WriteString(defaultPromptStyle.Render("›"))
+		s.WriteString(" ")
+		s.WriteString(model)
+	} else {
+		s.WriteString(defaultPromptStyle.Render("…"))
+		s.WriteString(" ")
+		s.WriteString(model)
+		s.WriteString("\n")
+	}
+
+	return s.String()
 }
