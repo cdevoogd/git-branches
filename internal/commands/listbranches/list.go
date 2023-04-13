@@ -1,4 +1,4 @@
-package list
+package listbranches
 
 import (
 	"fmt"
@@ -22,8 +22,8 @@ var (
 	}
 )
 
-// PrintBranches will print out information (name, type, desc) about the given branches to stdout.
-func PrintBranches(branches []*git.Branch) int {
+// Run will print out information (name, type, desc) about the given branches to stdout.
+func Run(branches []*git.Branch) int {
 	for _, branch := range branches {
 		err := printBranch(branch)
 		if err != nil {

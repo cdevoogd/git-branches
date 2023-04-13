@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/cdevoogd/git-branches/internal/commands/delbranches"
-	"github.com/cdevoogd/git-branches/internal/commands/list"
+	"github.com/cdevoogd/git-branches/internal/commands/listbranches"
 	"github.com/cdevoogd/git-branches/internal/git"
 	"github.com/cdevoogd/git-branches/internal/log"
 )
@@ -29,5 +29,5 @@ func main() {
 		os.Exit(delbranches.Run(branches))
 	}
 
-	os.Exit(list.PrintBranches(branches))
+	os.Exit(listbranches.Run(branches))
 }
