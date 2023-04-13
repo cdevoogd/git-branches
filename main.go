@@ -1,26 +1,9 @@
 package main
 
 import (
-	"fmt"
-
-	"github.com/fatih/color"
-
+	"github.com/cdevoogd/git-branches/internal/commands/list"
 	"github.com/cdevoogd/git-branches/internal/git"
 	"github.com/cdevoogd/git-branches/internal/log"
-)
-
-type branchStyle struct {
-	*color.Color
-	prefix string
-}
-
-var (
-	descStyle  = color.New(color.FgWhite)
-	nameStyles = map[git.BranchType]branchStyle{
-		git.BranchTypeNormal:   {prefix: "  ", Color: color.New(color.Bold, color.FgWhite)},
-		git.BranchTypeCurrent:  {prefix: "* ", Color: color.New(color.Bold, color.FgGreen)},
-		git.BranchTypeWorktree: {prefix: "+ ", Color: color.New(color.Bold, color.FgCyan)},
-	}
 )
 
 func main() {
@@ -33,19 +16,8 @@ func main() {
 		log.Fatal("An error occured when querying for branches:", err)
 	}
 
-	for _, branch := range branches {
-		nameStyle, ok := nameStyles[branch.Type]
-		if !ok {
-			log.Fatalf("No style is available for branch type %q", branch.Type)
-		}
-
-		name := nameStyle.Sprint(nameStyle.prefix, branch.Name)
-		desc := branch.Description
-		if desc != "" {
-			fmt.Printf("%s (%s)\n", name, descStyle.Sprint(desc))
-			continue
-		}
-
-		fmt.Println(name)
+	err = list.PrintBranches(branches)
+	if err != nil {
+		log.Fatal("Error listing branches:", err)
 	}
 }
