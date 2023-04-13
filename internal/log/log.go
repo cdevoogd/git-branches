@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fatih/color"
+	"github.com/cdevoogd/git-branches/internal/color"
+	"github.com/charmbracelet/lipgloss"
 )
 
-var errorPrefix = color.RedString("Error:")
+var errorPrefix = lipgloss.NewStyle().Foreground(color.Red).Render("Error:")
 
 // Error prints out an error-level log to stderr.
 func Error(v ...any) {

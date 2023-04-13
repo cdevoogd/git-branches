@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cdevoogd/git-branches/internal/color"
 	"github.com/cdevoogd/git-branches/internal/git"
 	"github.com/cdevoogd/git-branches/internal/log"
 	"github.com/charmbracelet/lipgloss"
@@ -13,8 +14,8 @@ import (
 )
 
 var (
-	itemStyle         = lipgloss.NewStyle().Foreground(lipgloss.Color("#FFFFFF"))
-	selectedItemStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#F14E32"))
+	itemStyle         = lipgloss.NewStyle().Foreground(color.White)
+	selectedItemStyle = lipgloss.NewStyle().Foreground(color.Red)
 )
 
 func Run(branches []*git.Branch) int {

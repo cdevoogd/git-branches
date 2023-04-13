@@ -2,23 +2,29 @@ package listbranches
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/cdevoogd/git-branches/internal/color"
 	"github.com/cdevoogd/git-branches/internal/git"
 	"github.com/cdevoogd/git-branches/internal/log"
-	"github.com/fatih/color"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type branchStyle struct {
-	*color.Color
+	style  lipgloss.Style
 	prefix string
 }
 
+func (b *branchStyle) render(branch string) string {
+	return b.style.Render(fmt.Sprint(b.prefix, branch))
+}
+
 var (
-	descStyle  = color.New(color.FgWhite)
+	descStyle  = lipgloss.NewStyle().Foreground(color.White)
 	nameStyles = map[git.BranchType]branchStyle{
-		git.BranchTypeNormal:   {prefix: "  ", Color: color.New(color.Bold, color.FgWhite)},
-		git.BranchTypeCurrent:  {prefix: "* ", Color: color.New(color.Bold, color.FgGreen)},
-		git.BranchTypeWorktree: {prefix: "+ ", Color: color.New(color.Bold, color.FgCyan)},
+		git.BranchTypeNormal:   {prefix: "  ", style: lipgloss.NewStyle().Bold(true).Foreground(color.White)},
+		git.BranchTypeCurrent:  {prefix: "* ", style: lipgloss.NewStyle().Bold(true).Foreground(color.Green)},
+		git.BranchTypeWorktree: {prefix: "+ ", style: lipgloss.NewStyle().Bold(true).Foreground(color.Cyan)},
 	}
 )
 
@@ -41,13 +47,13 @@ func printBranch(branch *git.Branch) error {
 		return fmt.Errorf("no style is available for branch type %q", branch.Type)
 	}
 
-	name := nameStyle.Sprint(nameStyle.prefix, branch.Name)
-	desc := branch.Description
-	if desc != "" {
-		fmt.Printf("%s (%s)\n", name, descStyle.Sprint(desc))
-		return nil
+	s := strings.Builder{}
+	s.WriteString(nameStyle.render(branch.Name))
+	if branch.Description != "" {
+		desc := descStyle.Render(fmt.Sprintf(" (%s)", branch.Description))
+		s.WriteString(descStyle.Render(desc))
 	}
 
-	fmt.Println(name)
+	fmt.Println(s.String())
 	return nil
 }
