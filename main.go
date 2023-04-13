@@ -15,9 +15,8 @@ type branchStyle struct {
 }
 
 var (
-	descStyle   = color.New(color.FgWhite)
-	commitStyle = color.New(color.Italic, color.FgWhite)
-	nameStyles  = map[git.BranchType]branchStyle{
+	descStyle  = color.New(color.FgWhite)
+	nameStyles = map[git.BranchType]branchStyle{
 		git.BranchTypeNormal:   {prefix: "  ", Color: color.New(color.Bold, color.FgWhite)},
 		git.BranchTypeCurrent:  {prefix: "* ", Color: color.New(color.Bold, color.FgGreen)},
 		git.BranchTypeWorktree: {prefix: "+ ", Color: color.New(color.Bold, color.FgCyan)},
@@ -34,22 +33,19 @@ func main() {
 		log.Fatal("An error occured when querying for branches:", err)
 	}
 
-	lastIndex := len(branches) - 1
-	for i, branch := range branches {
+	for _, branch := range branches {
 		nameStyle, ok := nameStyles[branch.Type]
 		if !ok {
 			log.Fatalf("No style is available for branch type %q", branch.Type)
 		}
 
-		nameStyle.Printf("%s%s", nameStyle.prefix, branch.Name)
-		if branch.Description != "" {
-			descStyle.Printf(" (%s)", branch.Description)
+		name := nameStyle.Sprint(nameStyle.prefix, branch.Name)
+		desc := branch.Description
+		if desc != "" {
+			fmt.Printf("%s (%s)\n", name, descStyle.Sprint(desc))
+			continue
 		}
-		commitStyle.Printf("\n    %s\n", branch.LastCommit)
 
-		// Add some spacing between branches
-		if i != lastIndex {
-			fmt.Println()
-		}
+		fmt.Println(name)
 	}
 }

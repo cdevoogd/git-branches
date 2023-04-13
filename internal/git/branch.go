@@ -25,7 +25,6 @@ type Branch struct {
 	Type        BranchType
 	Name        string
 	Description string
-	LastCommit  string
 }
 
 // NewBranch constructs a new Branch structure based on the given branch. The branch name must
@@ -34,13 +33,11 @@ type Branch struct {
 func NewBranch(name string) (*Branch, error) {
 	branchType, name := determineBranchType(name)
 	desc := getBranchDescription(name)
-	lastCommit := getLastCommit(name)
 
 	return &Branch{
 		Type:        branchType,
 		Name:        name,
 		Description: desc,
-		LastCommit:  lastCommit,
 	}, nil
 }
 
@@ -94,19 +91,6 @@ func getBranchDescription(name string) string {
 
 	// Git returns a non-zero exit code if the branch does not have a description, so I am relying
 	// on the exit code instead of the returned error.
-	if cmd.ProcessState.ExitCode() != 0 {
-		return ""
-	}
-
-	return strings.TrimSpace(string(stdout))
-}
-
-func getLastCommit(branch string) string {
-	cmd := exec.Command("git", "log", "-1", "--format=format:[%h] %s (%ah)", branch)
-	stdout, _ := cmd.Output()
-
-	// Git returns a non-zero exit code if the branch does not have a commit, so I am relying on
-	// the exit code instead of the returned error.
 	if cmd.ProcessState.ExitCode() != 0 {
 		return ""
 	}
