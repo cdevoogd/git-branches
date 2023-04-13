@@ -97,3 +97,17 @@ func getBranchDescription(name string) string {
 
 	return strings.TrimSpace(string(stdout))
 }
+
+// DeleteBranches will attempt to delete branches with the given names in the current repository.
+func DeleteBranches(branches []string) error {
+	args := []string{"branch", "-D"}
+	cmd := exec.Command("git", append(args, branches...)...)
+
+	// If you use Run instead of Output here, stderr will not be populated when an error occurs
+	_, err := cmd.Output()
+	if err != nil {
+		return gitError(err)
+	}
+
+	return nil
+}

@@ -1,27 +1,19 @@
 package main
 
 import (
-	"fmt"
+	"os"
 
-	"github.com/fatih/color"
-
+	"github.com/cdevoogd/git-branches/internal/commands/delbranches"
+	"github.com/cdevoogd/git-branches/internal/commands/listbranches"
 	"github.com/cdevoogd/git-branches/internal/git"
 	"github.com/cdevoogd/git-branches/internal/log"
 )
 
-type branchStyle struct {
-	*color.Color
-	prefix string
-}
+const deleteCommand = "delete"
 
-var (
-	descStyle  = color.New(color.FgWhite)
-	nameStyles = map[git.BranchType]branchStyle{
-		git.BranchTypeNormal:   {prefix: "  ", Color: color.New(color.Bold, color.FgWhite)},
-		git.BranchTypeCurrent:  {prefix: "* ", Color: color.New(color.Bold, color.FgGreen)},
-		git.BranchTypeWorktree: {prefix: "+ ", Color: color.New(color.Bold, color.FgCyan)},
-	}
-)
+func shouldRunDelete() bool {
+	return len(os.Args) == 2 && os.Args[1] == deleteCommand
+}
 
 func main() {
 	branches, err := git.Branches()
@@ -30,22 +22,12 @@ func main() {
 			log.Fatal("The current directory is not part of a Git repository")
 		}
 
-		log.Fatal("An error occured when querying for branches:", err)
+		log.Fatal("An error occurred when querying for branches: ", err)
 	}
 
-	for _, branch := range branches {
-		nameStyle, ok := nameStyles[branch.Type]
-		if !ok {
-			log.Fatalf("No style is available for branch type %q", branch.Type)
-		}
-
-		name := nameStyle.Sprint(nameStyle.prefix, branch.Name)
-		desc := branch.Description
-		if desc != "" {
-			fmt.Printf("%s (%s)\n", name, descStyle.Sprint(desc))
-			continue
-		}
-
-		fmt.Println(name)
+	if shouldRunDelete() {
+		os.Exit(delbranches.Run(branches))
 	}
+
+	os.Exit(listbranches.Run(branches))
 }
