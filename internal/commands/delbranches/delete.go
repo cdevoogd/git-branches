@@ -1,10 +1,12 @@
 package delbranches
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/cdevoogd/git-branches/internal/git"
+	"github.com/cdevoogd/git-branches/internal/log"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/cqroot/prompt"
 	"github.com/cqroot/prompt/multichoose"
@@ -15,14 +17,31 @@ var (
 	selectedItemStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#F14E32"))
 )
 
-func Run(branches []*git.Branch) error {
+func Run(branches []*git.Branch) int {
 	handler := newDeleteHandler(branches)
 	toDelete, err := handler.getBranchesToDelete()
 	if err != nil {
-		return err
+		if errors.Is(err, prompt.ErrUserQuit) {
+			fmt.Println("Exiting")
+			return 0
+		}
+
+		log.Error(err)
+		return 1
 	}
 
-	return git.DeleteBranches(toDelete)
+	if len(toDelete) == 0 {
+		fmt.Println("No branches were selected")
+		return 0
+	}
+
+	err = git.DeleteBranches(toDelete)
+	if err != nil {
+		log.Error(err)
+		return 1
+	}
+
+	return 0
 }
 
 type deleteHandler struct {

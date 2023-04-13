@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cdevoogd/git-branches/internal/git"
+	"github.com/cdevoogd/git-branches/internal/log"
 	"github.com/fatih/color"
 )
 
@@ -22,15 +23,16 @@ var (
 )
 
 // PrintBranches will print out information (name, type, desc) about the given branches to stdout.
-func PrintBranches(branches []*git.Branch) error {
+func PrintBranches(branches []*git.Branch) int {
 	for _, branch := range branches {
 		err := printBranch(branch)
 		if err != nil {
-			return err
+			log.Error(err)
+			return 1
 		}
 	}
 
-	return nil
+	return 0
 }
 
 func printBranch(branch *git.Branch) error {

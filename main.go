@@ -26,15 +26,8 @@ func main() {
 	}
 
 	if shouldRunDelete() {
-		err = delbranches.Run(branches)
-		if err != nil {
-			log.Fatal("Error deleting branches: ", err)
-		}
-		os.Exit(1)
+		os.Exit(delbranches.Run(branches))
 	}
 
-	err = list.PrintBranches(branches)
-	if err != nil {
-		log.Fatal("Error listing branches: ", err)
-	}
+	os.Exit(list.PrintBranches(branches))
 }
