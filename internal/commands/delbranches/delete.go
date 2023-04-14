@@ -49,15 +49,18 @@ func Run(branches []*git.Branch) int {
 }
 
 type deleteHandler struct {
+	choices  []string
 	branches map[string]*git.Branch
 }
 
 func newDeleteHandler(branches []*git.Branch) *deleteHandler {
 	handler := &deleteHandler{
+		choices:  make([]string, len(branches)),
 		branches: make(map[string]*git.Branch),
 	}
 
-	for _, branch := range branches {
+	for i, branch := range branches {
+		handler.choices[i] = branch.Name
 		handler.branches[branch.Name] = branch
 	}
 
@@ -65,14 +68,9 @@ func newDeleteHandler(branches []*git.Branch) *deleteHandler {
 }
 
 func (d *deleteHandler) getBranchesToDelete() ([]string, error) {
-	var choices []string
-	for name := range d.branches {
-		choices = append(choices, name)
-	}
-
 	msg := "Choose branches to delete:"
 	return prompt.New(prompt.WithTheme(themePrompt)).Ask(msg).MultiChoose(
-		choices,
+		d.choices,
 		multichoose.WithTheme(d.themeChoices),
 		multichoose.WithHelp(true),
 	)
