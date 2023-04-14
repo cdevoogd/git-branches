@@ -49,15 +49,18 @@ func Run(branches []*git.Branch) int {
 }
 
 type deleteHandler struct {
+	choices  []string
 	branches map[string]*git.Branch
 }
 
 func newDeleteHandler(branches []*git.Branch) *deleteHandler {
 	handler := &deleteHandler{
+		choices:  make([]string, len(branches)),
 		branches: make(map[string]*git.Branch),
 	}
 
-	for _, branch := range branches {
+	for i, branch := range branches {
+		handler.choices[i] = branch.Name
 		handler.branches[branch.Name] = branch
 	}
 
@@ -65,14 +68,9 @@ func newDeleteHandler(branches []*git.Branch) *deleteHandler {
 }
 
 func (d *deleteHandler) getBranchesToDelete() ([]string, error) {
-	var choices []string
-	for name := range d.branches {
-		choices = append(choices, name)
-	}
-
 	msg := "Choose branches to delete:"
 	return prompt.New(prompt.WithTheme(themePrompt)).Ask(msg).MultiChoose(
-		choices,
+		d.choices,
 		multichoose.WithTheme(d.themeChoices),
 		multichoose.WithHelp(true),
 	)
@@ -89,8 +87,14 @@ func (d *deleteHandler) themeChoices(branches []string, cursor int, isSelected m
 		s.WriteString(style.Render(fmt.Sprintf("[%s] %s", symbol, name)))
 
 		branch, ok := d.branches[name]
-		if ok && branch.Description != "" {
-			s.WriteString(style.Render(fmt.Sprintf(" (%s)", branch.Description)))
+		if ok {
+			if branch.Type != git.BranchTypeNormal {
+				s.WriteString(style.Render(fmt.Sprintf(" (%s)", branch.Type.String())))
+			}
+
+			if branch.Description != "" {
+				s.WriteString(style.Render(fmt.Sprintf(" (%s)", branch.Description)))
+			}
 		}
 
 		s.WriteString("\n")
@@ -132,8 +136,6 @@ func themePrompt(msg string, state prompt.State, model string) string {
 	s.WriteString(" ")
 
 	if state == prompt.StateNormal {
-		s.WriteString(defaultPromptStyle.Render("›"))
-		s.WriteString(" ")
 		s.WriteString(model)
 	} else {
 		s.WriteString(defaultPromptStyle.Render("…"))
