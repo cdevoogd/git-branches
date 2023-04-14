@@ -132,8 +132,6 @@ func themePrompt(msg string, state prompt.State, model string) string {
 	s.WriteString(" ")
 
 	if state == prompt.StateNormal {
-		s.WriteString(defaultPromptStyle.Render("›"))
-		s.WriteString(" ")
 		s.WriteString(model)
 	} else {
 		s.WriteString(defaultPromptStyle.Render("…"))
