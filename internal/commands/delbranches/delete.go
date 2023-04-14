@@ -87,8 +87,14 @@ func (d *deleteHandler) themeChoices(branches []string, cursor int, isSelected m
 		s.WriteString(style.Render(fmt.Sprintf("[%s] %s", symbol, name)))
 
 		branch, ok := d.branches[name]
-		if ok && branch.Description != "" {
-			s.WriteString(style.Render(fmt.Sprintf(" (%s)", branch.Description)))
+		if ok {
+			if branch.Type != git.BranchTypeNormal {
+				s.WriteString(style.Render(fmt.Sprintf(" (%s)", branch.Type.String())))
+			}
+
+			if branch.Description != "" {
+				s.WriteString(style.Render(fmt.Sprintf(" (%s)", branch.Description)))
+			}
 		}
 
 		s.WriteString("\n")
