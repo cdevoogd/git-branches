@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 
 	"github.com/cdevoogd/git-branches/internal/commands/delbranches"
@@ -10,11 +11,33 @@ import (
 	"github.com/cdevoogd/git-branches/internal/log"
 )
 
-var deleteMode bool
+// Command line flags
+var (
+	deleteMode  bool
+	versionMode bool
+)
+
+// These variables will be set during release builds by GoReleaser
+// https://goreleaser.com/cookbooks/using-main.version/
+var (
+	version = "dev"
+	commit  = "unknown"
+	date    = "unknown"
+)
+
+func printVersion() {
+	fmt.Printf("notify %s\ncommit: %s\nbuild date: %s\n", version, commit, date)
+}
 
 func main() {
 	flag.BoolVar(&deleteMode, "d", false, "Open a TUI to delete branches")
+	flag.BoolVar(&versionMode, "version", false, "Print version information")
 	flag.Parse()
+
+	if versionMode {
+		printVersion()
+		os.Exit(0)
+	}
 
 	branches, err := git.Branches()
 	if err != nil {
