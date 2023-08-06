@@ -1,0 +1,36 @@
+name: Publish Release
+
+on:
+  push:
+    tags: ["*"]
+
+permissions:
+  contents: write
+
+jobs:
+  goreleaser:
+    name: Build and Publish via GoReleaser
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: stable
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v4
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --clean
+        env:
+          # The automatically-created token wont work for updating the tap since the tap lives in
+          # another repository and the auto-generated token only gives access to this repository. A
+          # separate token is needed that was content write permissions to this repo and the tap
+          # repository.
+          GITHUB_TOKEN: ${{ secrets.GORELEASER_TOKEN }}

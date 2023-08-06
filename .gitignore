@@ -5,6 +5,7 @@
 !.gitignore
 !.gitattributes
 !.github
+!.goreleaser.yaml
 
 # Logs and databases
 *.log
