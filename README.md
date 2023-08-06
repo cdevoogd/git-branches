@@ -3,10 +3,18 @@ This is a simple tool to replace the usual `git branch` printout provided by Git
 
 When developing on branches that use ticket numbers, I find that it can sometimes be difficult to remember what exactly the branch was for. To help with this, I would add descriptions to the branches using `git branch --edit-description`, but Git does not provide an easy way for you to quickly look at all of the branches along with their descriptions. Instead, to get the description of a branch, you have to use a long command: `git config --get branch.<branch_name>.description`.
 
-This tool provides an alternative to `git branch` that also displays branch descriptions (if available) and recent commits. I personally find that this makes it a lot easier to quickly scan over my local brances, so hopefully it can help others too.
+This tool provides an alternative to `git branch` that also displays branch descriptions (if available) and recent commits. I personally find that this makes it a lot easier to quickly scan over my local branches, so hopefully it can help others too.
 
 ## Installation
-Currently, the best way to install this is directly with Go:
+
+If you use Homebrew, `notify` is available in my tap:
+
+```shell
+brew install cdevoogd/tap/git-branches
+```
+
+You can also install `notify` using Go:
+
 ```shell
 go install github.com/cdevoogd/git-branches@latest
 ```
