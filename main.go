@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -29,6 +30,17 @@ func printVersion() {
 	fmt.Printf("notify %s\ncommit: %s\nbuild date: %s\n", version, commit, date)
 }
 
+func getBranches() ([]*git.Branch, error) {
+	branches, err := git.Branches()
+	if err != nil {
+		if git.ErrNotInRepository(err) {
+			return nil, errors.New("the current directory is not part of a Git repository")
+		}
+		return nil, err
+	}
+	return branches, nil
+}
+
 func main() {
 	flag.BoolVar(&deleteMode, "d", false, "Open a TUI to delete branches")
 	flag.BoolVar(&versionMode, "version", false, "Print version information")
@@ -39,13 +51,9 @@ func main() {
 		os.Exit(0)
 	}
 
-	branches, err := git.Branches()
+	branches, err := getBranches()
 	if err != nil {
-		if git.ErrNotInRepository(err) {
-			log.Fatal("The current directory is not part of a Git repository")
-		}
-
-		log.Fatal("An error occurred when querying for branches: ", err)
+		log.Fatal("Error loading branches: ", err)
 	}
 
 	if deleteMode {
