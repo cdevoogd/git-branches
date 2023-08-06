@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"os"
 
 	"github.com/cdevoogd/git-branches/internal/commands/delbranches"
@@ -9,13 +10,12 @@ import (
 	"github.com/cdevoogd/git-branches/internal/log"
 )
 
-const deleteCommand = "delete"
-
-func shouldRunDelete() bool {
-	return len(os.Args) == 2 && os.Args[1] == deleteCommand
-}
+var deleteMode bool
 
 func main() {
+	flag.BoolVar(&deleteMode, "d", false, "Open a TUI to delete branches")
+	flag.Parse()
+
 	branches, err := git.Branches()
 	if err != nil {
 		if git.ErrNotInRepository(err) {
@@ -25,7 +25,7 @@ func main() {
 		log.Fatal("An error occurred when querying for branches: ", err)
 	}
 
-	if shouldRunDelete() {
+	if deleteMode {
 		os.Exit(delbranches.Run(branches))
 	}
 
