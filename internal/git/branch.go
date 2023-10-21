@@ -46,6 +46,9 @@ func Branches() ([]*Branch, error) {
 	cmd := exec.Command("git", "branch", "--list")
 	stdout, err := cmd.Output()
 	if err != nil {
+		if ErrNotInRepository(err) {
+			return nil, errors.New("the current directory is not part of a Git repository")
+		}
 		return nil, err
 	}
 	output := strings.TrimSpace(string(stdout))
