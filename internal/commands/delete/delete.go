@@ -12,9 +12,10 @@ import (
 )
 
 var Command = &cobra.Command{
-	Use:   "delete",
-	Short: "Open a TUI for deleting branches",
-	RunE:  Execute,
+	Use:          "delete",
+	Short:        "Open a TUI for deleting branches",
+	SilenceUsage: true,
+	RunE:         Execute,
 }
 
 func Execute(cmd *cobra.Command, args []string) error {

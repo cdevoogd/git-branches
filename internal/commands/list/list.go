@@ -9,9 +9,10 @@ import (
 )
 
 var Command = &cobra.Command{
-	Use:   "list",
-	Short: "List the current repository's branches",
-	RunE:  Execute,
+	Use:          "list",
+	Short:        "List the current repository's branches",
+	SilenceUsage: true,
+	RunE:         Execute,
 }
 
 func Execute(cmd *cobra.Command, args []string) error {
