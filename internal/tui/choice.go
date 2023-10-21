@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/cdevoogd/git-branches/internal/git"
+	"github.com/cdevoogd/git-branches/internal/tui/style"
 )
 
 type Choice struct {
@@ -43,10 +44,10 @@ type choiceRenderContext struct {
 
 func (c Choice) render(ctx *choiceRenderContext) string {
 	prefix := ctx.normalPrefix
-	styler := normalItemStyle
+	styler := style.NormalItem
 	if ctx.hovered {
 		prefix = ctx.hoveredPrefix
-		styler = highlightedItemStyle
+		styler = style.HighlightedItem
 	}
 	if ctx.selected {
 		prefix = ctx.selectedPrefix
@@ -54,9 +55,9 @@ func (c Choice) render(ctx *choiceRenderContext) string {
 
 	str := &strings.Builder{}
 
-	styler.Write(str, "%s%s", prefix, c.Name)
+	styler.Writef(str, "%s%s", prefix, c.Name)
 	if c.Note != "" {
-		noteStyle.Write(str, "  %s", c.Note)
+		style.Note.Writef(str, "  %s", c.Note)
 	}
 
 	return str.String()
