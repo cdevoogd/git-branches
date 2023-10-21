@@ -1,51 +1,48 @@
-package delbranches
+package delete
 
 import (
 	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/cdevoogd/git-branches/internal/color"
 	"github.com/cdevoogd/git-branches/internal/git"
-	"github.com/cdevoogd/git-branches/internal/log"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/cqroot/prompt"
 	"github.com/cqroot/prompt/multichoose"
+	"github.com/spf13/cobra"
 )
 
-var (
-	itemStyle         = lipgloss.NewStyle().Foreground(color.White)
-	selectedItemStyle = lipgloss.NewStyle().Foreground(color.Red)
+var Command = &cobra.Command{
+	Use:   "delete",
+	Short: "Open a TUI for deleting branches",
+	RunE:  Execute,
+}
 
-	defaultPromptStyle      = lipgloss.NewStyle().Foreground(color.Red)
-	finishPromptPrefixStyle = lipgloss.NewStyle().Foreground(lipgloss.Color(color.Green))
-)
+func Execute(cmd *cobra.Command, args []string) error {
+	branches, err := git.Branches()
+	if err != nil {
+		return fmt.Errorf("error loading branches: %w", err)
+	}
 
-func Run(branches []*git.Branch) int {
 	handler := newDeleteHandler(branches)
 	toDelete, err := handler.getBranchesToDelete()
 	if err != nil {
 		if errors.Is(err, prompt.ErrUserQuit) {
-			fmt.Println("Exiting")
-			return 0
+			return nil
 		}
-
-		log.Error(err)
-		return 1
+		return err
 	}
 
 	if len(toDelete) == 0 {
 		fmt.Println("No branches were selected")
-		return 0
+		return nil
 	}
 
 	err = git.DeleteBranches(toDelete)
 	if err != nil {
-		log.Error(err)
-		return 1
+		return err
 	}
 
-	return 0
+	return nil
 }
 
 type deleteHandler struct {
@@ -97,50 +94,6 @@ func (d *deleteHandler) themeChoices(branches []string, cursor int, isSelected m
 			}
 		}
 
-		s.WriteString("\n")
-	}
-
-	return s.String()
-}
-
-func getDisplayStyle(itemAtCursor, selected bool) (symbol string, style lipgloss.Style) {
-	if itemAtCursor {
-		if selected {
-			return "x", selectedItemStyle
-		}
-		return "•", selectedItemStyle
-	}
-	if selected {
-		return "x", itemStyle
-	}
-	return " ", itemStyle
-}
-
-// displayBranches returns a styled string that can be used to display the prompt to the user. It
-// is meant to fulfil the prompt.Theme interface. This acts similar to the default theme but with
-// colors that match the rest of the branch choice prompt.
-func themePrompt(msg string, state prompt.State, model string) string {
-	s := strings.Builder{}
-
-	switch state {
-	case prompt.StateNormal:
-		s.WriteString(defaultPromptStyle.Render("?"))
-	case prompt.StateFinish:
-		s.WriteString(finishPromptPrefixStyle.Render("✔"))
-	case prompt.StateError:
-		s.WriteString(defaultPromptStyle.Render("✖"))
-	}
-
-	s.WriteString(" ")
-	s.WriteString(msg)
-	s.WriteString(" ")
-
-	if state == prompt.StateNormal {
-		s.WriteString(model)
-	} else {
-		s.WriteString(defaultPromptStyle.Render("…"))
-		s.WriteString(" ")
-		s.WriteString(model)
 		s.WriteString("\n")
 	}
 
