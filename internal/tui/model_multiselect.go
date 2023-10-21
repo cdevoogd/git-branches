@@ -9,29 +9,29 @@ import (
 	mapset "github.com/deckarep/golang-set/v2"
 )
 
-type selectionModel struct {
+type multiSelectModel struct {
 	cursor   int
 	choices  []*Choice
 	selected mapset.Set[int]
-	keys     KeyMap
+	keys     MultiSelectKeyMap
 	help     help.Model
 }
 
-func newSelectionModel(choices []*Choice) *selectionModel {
-	return &selectionModel{
+func newMultiSelectModel(choices []*Choice) *multiSelectModel {
+	return &multiSelectModel{
 		cursor:   0,
 		choices:  choices,
 		selected: mapset.NewSet[int](),
-		keys:     DefaultKeyMap,
+		keys:     DefaultMultiSelectKeyMap,
 		help:     help.New(),
 	}
 }
 
-func (m *selectionModel) Init() tea.Cmd {
+func (m *multiSelectModel) Init() tea.Cmd {
 	return nil
 }
 
-func (m *selectionModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *multiSelectModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.help.Width = msg.Width
@@ -67,7 +67,7 @@ func (m *selectionModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m *selectionModel) View() string {
+func (m *multiSelectModel) View() string {
 	view := &strings.Builder{}
 
 	for i, choice := range m.choices {
@@ -87,7 +87,7 @@ func (m *selectionModel) View() string {
 	return view.String()
 }
 
-func (m *selectionModel) Selections() []*Choice {
+func (m *multiSelectModel) Selections() []*Choice {
 	iter := m.selected.Iterator()
 	defer iter.Stop()
 
@@ -98,7 +98,7 @@ func (m *selectionModel) Selections() []*Choice {
 	return choices
 }
 
-func (m *selectionModel) toggleSelection(index int) {
+func (m *multiSelectModel) toggleSelection(index int) {
 	if m.selected.Contains(index) {
 		m.selected.Remove(index)
 		return
@@ -106,6 +106,6 @@ func (m *selectionModel) toggleSelection(index int) {
 	m.selected.Add(index)
 }
 
-func (m *selectionModel) isSelected(index int) bool {
+func (m *multiSelectModel) isSelected(index int) bool {
 	return m.selected.Contains(index)
 }
