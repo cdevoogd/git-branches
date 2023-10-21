@@ -15,6 +15,8 @@ type multiSelectModel struct {
 	selected mapset.Set[int]
 	keys     MultiSelectKeyMap
 	help     help.Model
+	finished bool
+	err      error
 }
 
 func newMultiSelectModel(choices []*Choice) *multiSelectModel {
@@ -54,12 +56,14 @@ func (m *multiSelectModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.toggleSelection(m.cursor)
 
 		case key.Matches(msg, m.keys.Confirm):
+			m.finished = true
 			return m, tea.Quit
 
 		case key.Matches(msg, m.keys.Help):
 			m.help.ShowAll = !m.help.ShowAll
 
 		case key.Matches(msg, m.keys.Quit):
+			m.err = ErrQuit
 			return m, tea.Quit
 		}
 	}
@@ -96,6 +100,14 @@ func (m *multiSelectModel) Selections() []*Choice {
 		choices = append(choices, m.choices[index])
 	}
 	return choices
+}
+
+func (m *multiSelectModel) Finished() bool {
+	return m.finished
+}
+
+func (m *multiSelectModel) Error() error {
+	return m.err
 }
 
 func (m *multiSelectModel) toggleSelection(index int) {

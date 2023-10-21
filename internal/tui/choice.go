@@ -33,6 +33,18 @@ func NewChoiceFromBranch(branch *git.Branch) (*Choice, error) {
 	}, nil
 }
 
+func ConvertBranchesToChoices(branches []*git.Branch) ([]*Choice, error) {
+	choices := make([]*Choice, len(branches))
+	for i, branch := range branches {
+		choice, err := NewChoiceFromBranch(branch)
+		if err != nil {
+			return nil, err
+		}
+		choices[i] = choice
+	}
+	return choices, nil
+}
+
 type choiceRenderContext struct {
 	hovered  bool
 	selected bool

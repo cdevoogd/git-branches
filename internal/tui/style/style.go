@@ -14,6 +14,10 @@ var (
 		Light: "#909090",
 		Dark:  "#626262",
 	})}
+
+	NormalPrompt  = Style{lipgloss.NewStyle().Foreground(lipgloss.Color("8"))}
+	SuccessPrompt = Style{lipgloss.NewStyle().Foreground(lipgloss.Color("10"))}
+	ErrorPrompt   = Style{lipgloss.NewStyle().Foreground(lipgloss.Color("9"))}
 )
 
 type Style struct {

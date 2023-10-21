@@ -14,9 +14,11 @@ type singleSelectModel struct {
 	selection *Choice
 	keys      SingleSelectKeyMap
 	help      help.Model
+	finished  bool
+	err       error
 }
 
-func newSelectModel(choices []*Choice) *singleSelectModel {
+func newSingleSelectModel(choices []*Choice) *singleSelectModel {
 	return &singleSelectModel{
 		cursor:  0,
 		choices: choices,
@@ -50,12 +52,14 @@ func (m *singleSelectModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case key.Matches(msg, m.keys.Confirm):
 			m.selection = m.choices[m.cursor]
+			m.finished = true
 			return m, tea.Quit
 
 		case key.Matches(msg, m.keys.Help):
 			m.help.ShowAll = !m.help.ShowAll
 
 		case key.Matches(msg, m.keys.Quit):
+			m.err = ErrQuit
 			return m, tea.Quit
 		}
 	}
@@ -79,6 +83,17 @@ func (m *singleSelectModel) View() string {
 	return view.String()
 }
 
-func (m *singleSelectModel) Selection() *Choice {
-	return m.selection
+func (m *singleSelectModel) Selections() []*Choice {
+	if m.selection == nil {
+		return nil
+	}
+	return []*Choice{m.selection}
+}
+
+func (m *singleSelectModel) Finished() bool {
+	return m.finished
+}
+
+func (m *singleSelectModel) Error() error {
+	return m.err
 }

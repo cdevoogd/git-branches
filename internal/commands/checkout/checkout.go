@@ -1,6 +1,7 @@
 package checkout
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/cdevoogd/git-branches/internal/git"
@@ -21,21 +22,20 @@ func Execute(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("error loading branches: %w", err)
 	}
 
-	choices := make([]*tui.Choice, len(branches))
-	for i, branch := range branches {
-		choices[i], err = tui.NewChoiceFromBranch(branch)
-		if err != nil {
-			return fmt.Errorf("error converting branch to choice: %w", err)
-		}
+	choices, err := tui.ConvertBranchesToChoices(branches)
+	if err != nil {
+		return fmt.Errorf("error converting branches to choices: %w", err)
 	}
 
-	selection, err := tui.PromptForSelection(choices)
+	selection, err := tui.PromptForSelection("Select a branch to checkout", choices)
 	if err != nil {
+		if errors.Is(err, tui.ErrQuit) {
+			return nil
+		}
 		return err
 	}
 
 	if selection == nil {
-		fmt.Println("No branches were selected")
 		return nil
 	}
 
