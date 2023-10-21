@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cdevoogd/git-branches/internal/color"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -18,6 +19,10 @@ var (
 	NormalPrompt  = Style{lipgloss.NewStyle().Foreground(lipgloss.Color("8"))}
 	SuccessPrompt = Style{lipgloss.NewStyle().Foreground(lipgloss.Color("10"))}
 	ErrorPrompt   = Style{lipgloss.NewStyle().Foreground(lipgloss.Color("9"))}
+
+	NormalBranch   = Style{lipgloss.NewStyle().Foreground(color.White)}
+	CurrentBranch  = Style{lipgloss.NewStyle().Foreground(color.Green)}
+	WorktreeBranch = Style{lipgloss.NewStyle().Foreground(color.Cyan)}
 )
 
 type Style struct {
