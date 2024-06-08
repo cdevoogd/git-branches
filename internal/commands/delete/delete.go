@@ -22,20 +22,22 @@ func Execute(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("error loading branches: %w", err)
 	}
 
-	choices, err := tui.ConvertBranchesToChoices(branches)
+	items, err := tui.ItemsFromBranches(branches)
 	if err != nil {
-		return fmt.Errorf("error converting branches to choices: %w", err)
+		return fmt.Errorf("error converting branches to items: %w", err)
 	}
 
-	selections, err := tui.PromptForSelections("Select branches to delete", choices)
+	selections, err := tui.RunMultiSelect(items)
 	if err != nil {
 		if errors.Is(err, tui.ErrQuit) {
+			fmt.Println("The prompt was manually exited")
 			return nil
 		}
 		return err
 	}
 
 	if len(selections) == 0 {
+		fmt.Println("No branches were selected")
 		return nil
 	}
 
@@ -44,6 +46,7 @@ func Execute(cmd *cobra.Command, args []string) error {
 		branchNames[i] = selection.Name
 	}
 
+	fmt.Printf("Deleting %d branches\n", len(selections))
 	err = git.DeleteBranches(branchNames)
 	if err != nil {
 		return err

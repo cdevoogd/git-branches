@@ -22,23 +22,26 @@ func Execute(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("error loading branches: %w", err)
 	}
 
-	choices, err := tui.ConvertBranchesToChoices(branches)
+	items, err := tui.ItemsFromBranches(branches)
 	if err != nil {
-		return fmt.Errorf("error converting branches to choices: %w", err)
+		return fmt.Errorf("error converting branches to items: %w", err)
 	}
 
-	selection, err := tui.PromptForSelection("Select a branch to checkout", choices)
+	selection, err := tui.RunSingleSelect(items)
 	if err != nil {
 		if errors.Is(err, tui.ErrQuit) {
+			fmt.Println("The prompt was manually exited")
 			return nil
 		}
 		return err
 	}
 
 	if selection == nil {
+		fmt.Println("No branch was selected")
 		return nil
 	}
 
+	fmt.Println("Checking out:", selection.Name)
 	err = git.CheckoutBranch(selection.Name)
 	if err != nil {
 		return err
