@@ -1,3 +1,4 @@
+version: 2
 before:
   hooks:
     - go mod tidy
@@ -45,7 +46,7 @@ brews:
     license: MIT
     install: |
       bin.install "{{ .Binary }}"
-    folder: Formula
+    directory: Formula
     repository:
       owner: cdevoogd
       name: homebrew-tap

@@ -1,6 +1,6 @@
 module github.com/cdevoogd/git-branches
 
-go 1.21
+go 1.22
 
 require (
 	github.com/charmbracelet/bubbles v0.16.1
