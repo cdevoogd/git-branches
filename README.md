@@ -7,13 +7,13 @@ This tool provides an alternative to `git branch` that also displays branch desc
 
 ## Installation
 
-If you use Homebrew, `notify` is available in my tap:
+If you use Homebrew, `git-branches` is available in my tap:
 
 ```shell
 brew install cdevoogd/tap/git-branches
 ```
 
-You can also install `notify` using Go:
+You can also install using `go install`:
 
 ```shell
 go install github.com/cdevoogd/git-branches@latest
