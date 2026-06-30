@@ -17,7 +17,7 @@ checksum:
   name_template: 'checksums.txt'
 
 archives:
-  - format: tar.gz
+  - formats: ["tar.gz"]
     # This name template makes the OS and Arch compatible with the results of uname.
     name_template: >-
       {{ .ProjectName }}_
@@ -29,7 +29,7 @@ archives:
     # Use zip for windows archives
     format_overrides:
     - goos: windows
-      format: zip
+      formats: ["zip"]
 
 release:
   github:
@@ -39,25 +39,8 @@ release:
   replace_existing_draft: true
   prerelease: auto
 
-brews:
-  - name: git-branches
-    description: An alternative to `git branch` with some extra information.
-    homepage: https://github.com/cdevoogd/git-branches
-    license: MIT
-    install: |
-      bin.install "{{ .Binary }}"
-    directory: Formula
-    repository:
-      owner: cdevoogd
-      name: homebrew-tap
-      branch: goreleaser/{{ .ProjectName }}-{{ .Version }}
-      pull_request:
-        enabled: true
-        base:
-          branch: master
-
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  version_template: "{{ incpatch .Version }}-next"
 
 changelog:
   sort: asc
